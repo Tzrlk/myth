@@ -1,30 +1,21 @@
-//!
+//! The calculation that actually does the hard work.
 
-use estimate;
-use bound;
-use calc_result;
-use rand::distributions::Range;
+use rand::thread_rng;
+use rand::distributions::{ Range, IndependentSample };
+use std::error::Error;
 
-pub fn select(chaos: i32, prob: Estimate) {
-	return select(chaos, prob.toInt());
-}
+use super::calc_result::CalcResult;
+use super::bounds::TABLE;
 
-pub fn select(chaos: i32, prob: i32) -> Bound {
-	return table[prob][chaos];
-}
+/// This calculates which of the four results should occur given estimate and chaos scores.
+pub fn calc(estimate: i32, chaos: i32) -> Option<CalcResult> {
 
-pub fn calc(chaos: i32, prob: Estimate) {
-	return calc(chaos, prob.toInt());
-}
+	let roll = Range::new(1, 101).ind_sample(&mut thread_rng());
+	let bound = TABLE.as_ref()[estimate as usize][chaos as usize];
 
-pub fn calc(chaos: i32, prob: i32) {
-
-	let roll = Range::new(0, 100).ind_sample(rand::thread_rng());
-	let bound = select(chaos, prob);
-
-	if roll <= bound.lower  { return CalcResult::HellYes; }
-	if roll <= bound.middle { return CalcResult::Yes;     }
-	if roll <= bound.upper  { return CalcResult::No;      }
-	                          return CalcResult::HellNo;
+	if roll <= bound[0] { return Some(CalcResult::HellYes); }
+	if roll <= bound[1] { return Some(CalcResult::Yes);     }
+	if roll <= bound[2] { return Some(CalcResult::No);      }
+	                      return Some(CalcResult::HellNo);
 
 }

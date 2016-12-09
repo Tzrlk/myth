@@ -13,13 +13,11 @@ build = "build.rs"
 clap = "^2.19"
 log = "^0.3"
 log4rs = "^0.5"
-rust-sqlite = "^0.3"
 phf = "^0.7"
-phf_codegen = "^0.7"
 rand = "^0.3"
 
 [dev-dependencies]
-stainless = "^0.1"
+# stainless = "^0.1"
 
 [package.metadata.release]
 sign-commit = true

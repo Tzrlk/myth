@@ -1,6 +1,7 @@
 //! The main entry point for the myth cli.
 
 mod char;
+mod check;
 mod init;
 mod scene;
 mod status;
@@ -10,15 +11,22 @@ use log4rs::config::{ Config, Appender, Root };
 use log4rs::append::console::ConsoleAppender;
 use log::LogLevelFilter;
 
-pub struct Myth;
+use ::util::cli_node::CliNode;
+type CharCmd = self::char::Cmd;
+type CheckCmd = self::check::Cmd;
+type InitCmd = self::init::Cmd;
+type SceneCmd = self::scene::Cmd;
+type StatusCmd = self::status::Cmd;
 
-impl CliNode for Myth {
+pub struct Cmd;
+
+impl CliNode for Cmd {
 
 	fn build_args<'a, 'b>() -> App<'a, 'b> {
 
 		return App::new(env!("CARGO_PKG_NAME"))
 			.version(crate_version!())
-			.author(crate_author!())
+			.author(crate_authors!())
 			.about(env!("CARGO_PKG_DESCRIPTION"))
 
 			.arg(Arg::with_name("verbose")
@@ -31,7 +39,15 @@ impl CliNode for Myth {
 				.help("Decreases the level of logging.")
 				.long("quiet")
 				.short("q")
-				.multiple(true));
+				.multiple(true))
+
+			.subcommand(CharCmd::build_args())
+			.subcommand(CheckCmd::build_args())
+			.subcommand(InitCmd::build_args())
+			.subcommand(SceneCmd::build_args())
+			.subcommand(StatusCmd::build_args())
+
+		;
 
 	}
 
@@ -45,14 +61,19 @@ impl CliNode for Myth {
 			-3 => LogLevelFilter::Off,
 			-2 => LogLevelFilter::Error,
 			-1 => LogLevelFilter::Warn,
-			0 => LogLevelFilter::Info,
-			1 => LogLevelFilter::Debug,
-			_ => LogLevelFilter::Trace
+			 0 => LogLevelFilter::Info,
+			 1 => LogLevelFilter::Debug,
+			 _ => LogLevelFilter::Trace
 		});
 
 		/// Figure out what subcommand (if any) has been called.
 		match args.subcommand() {
-			(&_, _) => println!("{}", args.usage())
+			("char",   Some(sub)) => CharCmd::execute(sub),
+			("check",  Some(sub)) => CheckCmd::execute(sub),
+			("init",   Some(sub)) => InitCmd::execute(sub),
+			("scene",  Some(sub)) => SceneCmd::execute(sub),
+			("status", Some(sub)) => StatusCmd::execute(sub),
+			(&_, _)               => println!("{}", args.usage())
 		}
 
 	}

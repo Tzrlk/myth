@@ -1,8 +1,6 @@
 //!
 
-include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
-
-pub mod result;
-pub mod estimate;
+pub mod bounds;
 pub mod calc;
-pub mod bound;
+pub mod calc_result;
+pub mod estimate;
