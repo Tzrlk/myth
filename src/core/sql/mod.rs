@@ -5,4 +5,3 @@ pub mod game;
 pub mod scene;
 pub mod check;
 pub mod char;
-pub mod error;

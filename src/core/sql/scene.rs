@@ -1,13 +1,12 @@
 //! Represents a scene in a [Game].
 
-use std::error::Error;
-
 use time::Timespec;
 use rusqlite::Connection;
 
-use core::sql::dao::Dao;
-use core::sql::game::Game;
-use core::sql::error::RequiredValueError;
+use super::dao::Dao;
+use super::game::Game;
+use ::core::error::Error;
+use ::core::error_value_required::ErrorValueRequired::new as required;
 
 #[derive(Debug)]
 struct Scene {
@@ -21,7 +20,7 @@ struct Scene {
 
 impl Dao<Scene> for Scene {
 
-	fn schema<E: Error>(conn: Connection) -> Result<(), &'static E> {
+	fn schema(conn: Connection) -> Result<(), E> {
 		return conn.execute("CREATE TABLE schema ( \
 			id              INTEGER PRIMARY KEY, \
 			game_id         INTEGER NOT NULL, \
@@ -32,9 +31,9 @@ impl Dao<Scene> for Scene {
 		", &[]);
 	}
 
-	fn read<E: Error>(&self, conn: Connection) -> Result<Scene, &'static E> {
+	fn read(&self, conn: Connection) -> Result<Scene, Error> {
 
-		let id = self.id.ok_or(RequiredValueError { name: "id" })?;
+		let id = self.id.ok_or(required("id"))?;
 
 		let stmt = conn.prepare_cached("\
 			SELECT \
@@ -59,11 +58,11 @@ impl Dao<Scene> for Scene {
 
 	}
 
-	fn update<E: Error>(&self, conn: Connection) -> Result<Scene, &'static E> {
+	fn update(&self, conn: Connection) -> Result<Scene, Error> {
 
-		let desc = self.desc.ok_or(RequiredValueError { name: "desc" })?;
-		let version = self.version.ok_or(RequiredValueError { name: "version" })?;
-		let id = self.id.ok_or(RequiredValueError { name: "id" })?;
+		let desc = self.desc.ok_or(required("desc"))?;
+		let version = self.version.ok_or(required("version"))?;
+		let id = self.id.ok_or(required("id"))?;
 
 		let stmt = conn.prepare_cached("\
 			UPDATE people ( desc, time_updated, version ) \
@@ -75,9 +74,9 @@ impl Dao<Scene> for Scene {
 
 	}
 
-	fn delete<E: Error>(&self, conn: Connection) -> Result<Scene, &'static E> {
+	fn delete(&self, conn: Connection) -> Result<Scene, Error> {
 
-		let id = self.id.ok_or(RequiredValueError { name: "id" })?;
+		let id = self.id.ok_or(required("id"))?;
 
 		let stmt = conn.prepare_cached("DELETE FROM Scene \
 			WHERE id = ?")?;
@@ -89,11 +88,11 @@ impl Dao<Scene> for Scene {
 
 	}
 
-	fn create<E: Error>(&self, conn: Connection) -> Result<Scene, &'static E> {
+	fn create(&self, conn: Connection) -> Result<Scene, Error> {
 
-		let game = self.game.ok_or(RequiredValueError { name: "game" })?;
-		let game_id = game.id.ok_or(RequiredValueError { name: "game_id" })?;
-		let desc = self.desc.ok_or(RequiredValueError { name: "desc" })?;
+		let game = self.game.ok_or(required("game"))?;
+		let game_id = game.id.ok_or(required("game_id"))?;
+		let desc = self.desc.ok_or(required("desc"))?;
 
 		let stmt = conn.prepare_cached("INSERT INTO Scene (\
 			id, game_id, desc, created, updated, version ) \

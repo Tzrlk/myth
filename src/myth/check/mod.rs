@@ -1,9 +1,11 @@
 //!
 
+mod bounds;
+mod calc;
+
 use clap::{ App, ArgMatches, SubCommand, Arg };
 
 use ::util::cli_node::CliNode;
-use ::core::calc;
 
 pub struct Cmd;
 

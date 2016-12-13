@@ -1,21 +1,29 @@
 //! Defines errors for sql stuff.
 
-use std::error::{ Error };
+use std::error::Error as StdError;
 use std::fmt::{ Display, Formatter };
 use std::fmt::Error as DisplayError;
 
 #[derive(Debug)]
-pub struct RequiredValueError {
+pub struct ErrorValueRequired {
 	name: &'static str
 }
 
-impl Error for RequiredValueError {
+impl ErrorValueRequired {
+	fn new(name: &str) -> ErrorValueRequired {
+		return ErrorValueRequired {
+			name: name
+		};
+	}
+}
+
+impl StdError for ErrorValueRequired {
 	fn description(&self) -> &str {
 		return "Unable to proceed with operation without required value";
 	}
 }
 
-impl Display for RequiredValueError {
+impl Display for ErrorValueRequired {
 	fn fmt(&self, f: &mut Formatter) -> Result<(), DisplayError> {
 		return write!(f, "{}: {}", self.description(), self.name);
 	}
