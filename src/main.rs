@@ -21,6 +21,8 @@ extern crate clap;
 
 extern crate phf;
 extern crate rand;
+extern crate time;
+extern crate rusqlite;
 
 use ::util::cli_node::CliNode;
 type MythCmd = self::myth::Cmd;

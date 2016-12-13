@@ -2,7 +2,6 @@
 
 use rand::thread_rng;
 use rand::distributions::{ Range, IndependentSample };
-use std::error::Error;
 
 use super::calc_result::CalcResult;
 use super::bounds::TABLE;
