@@ -3,21 +3,23 @@
 use std::error::Error as StdError;
 use std::convert::From;
 
-use rusqlite::Error as RusqlError;
+//use rusqlite::Error as RusqlError;
 
 use super::error_value_required::ErrorValueRequired;
 
 pub enum Error {
-	ValueRequired(ErrorValueRequired),
-	Rusql(RusqlError)
+	ValueRequired(ErrorValueRequired)//,
+//	Rusql(RusqlError)
 }
 
-impl <T: StdError> From<T> for Error {
-	fn from(error: T) -> Error {
-		return match error {
-			ErrorValueRequired => Error::ValueRequired(error as ErrorValueRequired),
-			RusqlError         => Error::Rusql(error as RusqlError),
-			_                  => panic!("{}", error)
-		};
+impl From<ErrorValueRequired> for Error {
+	fn from(error: ErrorValueRequired) -> Error {
+		return Error::ValueRequired(error);
 	}
 }
+
+//impl From<RusqlError> for Error {
+//	fn from(error: RusqlError) -> Error {
+//		return Error::Rusql(error);
+//	}
+//}

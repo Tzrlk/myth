@@ -53,7 +53,7 @@ impl CliNode for Cmd {
 
 	fn execute(args: &ArgMatches) {
 
-		/// Determine the level of logging from the verbose and quiet flags
+		// Determine the level of logging from the verbose and quiet flags
 		let quietness = args.occurrences_of("q");
 		let verbosity = args.occurrences_of("v");
 		let log_level = ( verbosity - quietness ) as i32;
@@ -66,7 +66,7 @@ impl CliNode for Cmd {
 			 _ => LogLevelFilter::Trace
 		});
 
-		/// Figure out what subcommand (if any) has been called.
+		// Figure out what subcommand (if any) has been called.
 		match args.subcommand() {
 			("char",   Some(sub)) => CharCmd::execute(sub),
 			("check",  Some(sub)) => CheckCmd::execute(sub),
@@ -83,7 +83,7 @@ impl CliNode for Cmd {
 /// Sets up the logging with the provided level.
 fn build_logging(level: LogLevelFilter) -> Config {
 
-	/// This needs to be like this for the Box::new invocation.
+	// This needs to be like this for the Box::new invocation.
 	let stdout = ConsoleAppender::builder().build();
 
 	return Config::builder()

@@ -1,26 +1,26 @@
 [package]
-name = "myth"
-version = "0.1.0"
-authors = [ "Peter Cummuskey <peterc@aetheric.co.nz>" ]
+name        = "myth"
+version     = "0.1.0"
+authors     = [ "Peter Cummuskey <peterc@aetheric.co.nz>" ]
 description = "A command-line application for managing mythic GM assistance/emulation."
-homepage = "http://aetheric.co.nz/mythic"
-repository = "https://github.com/aetheric/mythic"
-keywords = [ "cli", "rpg", "tool" ]
-license = "MIT"
-build = "build.rs"
+homepage    = "http://aetheric.co.nz/mythic"
+repository  = "https://github.com/aetheric/mythic"
+keywords    = [ "cli", "rpg", "tool" ]
+license     = "MIT"
+build       = "build.rs"
 
 [dependencies]
-clap = "^2.19"
-log = "^0.3"
+clap   = "^2.19"
+log    = "^0.3"
 log4rs = "^0.5"
-phf = "^0.7"
-rand = "^0.3"
-rusqlite = "^0.7"
-time = "^0.1"
+num    = "^0.2.0"
+phf    = "^0.7"
+rand   = "^0.3"
+time   = "^0.1"
 
 [dev-dependencies]
 # stainless = "^0.1"
 
 [package.metadata.release]
 sign-commit = true
-upload-doc = true
+upload-doc  = true

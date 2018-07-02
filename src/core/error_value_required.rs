@@ -6,11 +6,11 @@ use std::fmt::Error as DisplayError;
 
 #[derive(Debug)]
 pub struct ErrorValueRequired {
-	name: &'static str
+	name: String
 }
 
 impl ErrorValueRequired {
-	fn new(name: &str) -> ErrorValueRequired {
+	fn new(name: String) -> ErrorValueRequired {
 		return ErrorValueRequired {
 			name: name
 		};

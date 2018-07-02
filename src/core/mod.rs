@@ -4,6 +4,6 @@
 
 pub mod calc_result;
 pub mod estimate;
-pub mod sql;
+//pub mod sql;
 pub mod error;
 pub mod error_value_required;

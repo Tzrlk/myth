@@ -1,7 +1,6 @@
 //!
 
-mod bounds;
-mod calc;
+mod fate;
 
 use clap::{ App, ArgMatches, SubCommand, Arg };
 
@@ -14,7 +13,7 @@ impl CliNode for Cmd {
 	fn build_args<'a, 'b>() -> App<'a, 'b> {
 
 		return SubCommand::with_name("check")
-			.about("Performs a table check")
+			.about("Performs a fate check")
 
 			.arg(Arg::with_name("estimate")
 				.help("The base likelihood of a yes response")
@@ -28,8 +27,15 @@ impl CliNode for Cmd {
 				.help("How crazy things have gotten")
 				.long("chaos")
 				.short("c")
-				.possible_values(&[ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" ])
+				.possible_values(&[ "3", "4", "5", "6" ])
 				.default_value("0"))
+
+			.arg(Arg::with_name("desired")
+				.help("The desired outcome")
+				.long("desired")
+				.short("d")
+				.possible_values(&[ "yes", "no" ])
+				.default_value("yes"))
 
 			.arg(Arg::with_name("save")
 				.help("Save the result to the database")
@@ -47,9 +53,10 @@ impl CliNode for Cmd {
 	fn execute(args: &ArgMatches) {
 
 		let estimate = args.value_of("estimate").unwrap().parse::<i32>().unwrap();
-		let chaos = args.value_of("chaos").unwrap().parse::<i32>().unwrap();
+		let chaos    = args.value_of("chaos")   .unwrap().parse::<i32>().unwrap();
+		let desired  = args.value_of("desired").unwrap() == "yes";
 
-		let result = calc::calc(estimate, chaos).unwrap();
+		let result = fate::calc(estimate, chaos, true).unwrap();
 		print!("{}", result);
 
 	}
