@@ -10,12 +10,12 @@ use ::core::error_value_required::ErrorValueRequired::new as required;
 
 #[derive(Debug)]
 struct Scene {
-	id: Option<i32>,
-	game: Option<Game>,
-	desc: Option<&'static str>,
+	id:           Option<i32>,
+	game:         Option<Game>,
+	desc:         Option<&'static str>,
 	time_created: Option<Timespec>,
 	time_updated: Option<Timespec>,
-	version: Option<i32>
+	version:      Option<i32>
 }
 
 impl Dao<Scene> for Scene {
@@ -29,6 +29,21 @@ impl Dao<Scene> for Scene {
 			time_updated    TEXT NOT NULL, \
 			version         INTEGER NOT NULL )\
 		", &[]);
+	}
+
+	fn create(&self, conn: Connection) -> Result<Scene, Error> {
+
+		let game = self.game.ok_or(required("game"))?;
+		let game_id = game.id.ok_or(required("game_id"))?;
+		let desc = self.desc.ok_or(required("desc"))?;
+
+		let stmt = conn.prepare_cached("INSERT INTO Scene (\
+			id, game_id, desc, created, updated, version ) \
+			VALUES ( SEQ(), ?, ?, NOW(), NOW(), 1")?;
+
+		let result = stmt.execute(&[ game_id, desc ]);
+		return self.read(conn);
+
 	}
 
 	fn read(&self, conn: Connection) -> Result<Scene, Error> {
@@ -85,21 +100,6 @@ impl Dao<Scene> for Scene {
 		stmt.execute(&[ id ])?;
 
 		return existing;
-
-	}
-
-	fn create(&self, conn: Connection) -> Result<Scene, Error> {
-
-		let game = self.game.ok_or(required("game"))?;
-		let game_id = game.id.ok_or(required("game_id"))?;
-		let desc = self.desc.ok_or(required("desc"))?;
-
-		let stmt = conn.prepare_cached("INSERT INTO Scene (\
-			id, game_id, desc, created, updated, version ) \
-			VALUES ( SEQ(), ?, ?, NOW(), NOW(), 1")?;
-
-		let result = stmt.execute(&[ game_id, desc ]);
-		return self.read(conn);
 
 	}
 

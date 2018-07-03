@@ -10,13 +10,17 @@ license     = "MIT"
 build       = "build.rs"
 
 [dependencies]
-clap   = "^2.19"
-log    = "^0.3"
-log4rs = "^0.5"
-num    = "^0.2.0"
-phf    = "^0.7"
-rand   = "^0.3"
-time   = "^0.1"
+clap     = "^2.19"
+log      = "^0.3"
+log4rs   = "^0.5"
+num      = "^0.2.0"
+phf      = "^0.7"
+rand     = "^0.3"
+time     = "^0.1"
+
+[dependencies.rusqlite]
+version  = "^0.13.0"
+features = [ "bundled" ]
 
 [dev-dependencies]
 # stainless = "^0.1"
