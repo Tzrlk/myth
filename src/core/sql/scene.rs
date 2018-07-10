@@ -12,7 +12,7 @@ use ::core::error_value_required::ErrorValueRequired::new as required;
 struct Scene {
 	id:           Option<i32>,
 	game:         Option<Game>,
-	desc:         Option<&'static str>,
+	desc:         Option<String>,
 	time_created: Option<Timespec>,
 	time_updated: Option<Timespec>,
 	version:      Option<i32>
@@ -20,8 +20,9 @@ struct Scene {
 
 impl Dao<Scene> for Scene {
 
-	fn schema(conn: Connection) -> Result<(), E> {
-		return conn.execute("CREATE TABLE schema ( \
+	fn schema(conn: Connection) -> Result<(), Error> {
+
+		let result = conn.execute("CREATE TABLE schema ( \
 			id              INTEGER PRIMARY KEY, \
 			game_id         INTEGER NOT NULL, \
 			desc            TEXT NOT NULL, \
@@ -29,6 +30,15 @@ impl Dao<Scene> for Scene {
 			time_updated    TEXT NOT NULL, \
 			version         INTEGER NOT NULL )\
 		", &[]);
+
+		return result
+			.and_then(|_| {
+				return Ok(());
+
+			}).or_else(|sqlerror| {
+				return Err(Error::from(sqlerror));
+			});
+
 	}
 
 	fn create(&self, conn: Connection) -> Result<Scene, Error> {
@@ -37,7 +47,7 @@ impl Dao<Scene> for Scene {
 		let game_id = game.id.ok_or(required("game_id"))?;
 		let desc = self.desc.ok_or(required("desc"))?;
 
-		let stmt = conn.prepare_cached("INSERT INTO Scene (\
+		let mut stmt = conn.prepare_cached("INSERT INTO Scene (\
 			id, game_id, desc, created, updated, version ) \
 			VALUES ( SEQ(), ?, ?, NOW(), NOW(), 1")?;
 
@@ -50,7 +60,7 @@ impl Dao<Scene> for Scene {
 
 		let id = self.id.ok_or(required("id"))?;
 
-		let stmt = conn.prepare_cached("\
+		let mut stmt = conn.prepare_cached("\
 			SELECT \
 				id, \
 				time_created, \
@@ -69,6 +79,11 @@ impl Dao<Scene> for Scene {
 				time_updated:   Some(row.get(4)),
 				version:        Some(row.get(5))
 			}
+		}).and_then(|mapped| {
+			// TODO: unwrap map here.
+
+		}).or_else(|sqlerror| {
+			return Err(Error::from(sqlerror));
 		});
 
 	}
@@ -79,7 +94,7 @@ impl Dao<Scene> for Scene {
 		let version = self.version.ok_or(required("version"))?;
 		let id = self.id.ok_or(required("id"))?;
 
-		let stmt = conn.prepare_cached("\
+		let mut stmt = conn.prepare_cached("\
 			UPDATE people ( desc, time_updated, version ) \
 			VALUES ( ?, NOW(), ? ) \
 			WHERE id = ? AND version = ?")?;
@@ -93,13 +108,13 @@ impl Dao<Scene> for Scene {
 
 		let id = self.id.ok_or(required("id"))?;
 
-		let stmt = conn.prepare_cached("DELETE FROM Scene \
+		let mut stmt = conn.prepare_cached("DELETE FROM Scene \
 			WHERE id = ?")?;
 
 		let existing = self.read(conn)?;
 		stmt.execute(&[ id ])?;
 
-		return existing;
+		return Ok(existing);
 
 	}
 

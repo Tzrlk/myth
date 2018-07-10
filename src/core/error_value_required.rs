@@ -10,11 +10,11 @@ pub struct ErrorValueRequired {
 }
 
 impl ErrorValueRequired {
-	fn new(name: String) -> ErrorValueRequired {
-		return ErrorValueRequired {
-			name: name
-		};
+
+	fn new(name: &str) -> ErrorValueRequired {
+		return ErrorValueRequired { name: name.to_string() };
 	}
+
 }
 
 impl StdError for ErrorValueRequired {
@@ -27,4 +27,19 @@ impl Display for ErrorValueRequired {
 	fn fmt(&self, f: &mut Formatter) -> Result<(), DisplayError> {
 		return write!(f, "{}: {}", self.description(), self.name);
 	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	describe! error_value_required {
+
+		it "formats its description along with the value name" {
+			let msg = format!("{}", ErrorValueRequired::new("my_value"));
+			assert_eq!(msg, "Unable to proceed with operation without required value: my_value");
+		}
+
+	}
+
 }

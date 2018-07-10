@@ -1,8 +1,7 @@
 //!
 
-//#![feature(plugin)]
-//#![feature(test)]
-//#![cfg_attr(test, plugin(stainless))]
+#![feature(plugin)]
+#![cfg_attr(test, plugin(stainless))]
 
 #![allow(unused_variables)]
 

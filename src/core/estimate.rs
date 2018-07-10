@@ -13,32 +13,32 @@ pub enum Estimate {
 	VeryLikely     = 7,
 	NearSureThing  = 8,
 	SureThing      = 9,
-	HasToBe        = 10
+	HasToBe        = 10,
 }
 
 impl Estimate {
+}
 
-	fn from_i32(index: i32) -> Option<Estimate> {
+impl From<i32> for Estimate {
+	fn from(index: i32) -> Self {
 		return match index {
-			0  => Some(Estimate::Impossible),
-			1  => Some(Estimate::NoWay),
-			2  => Some(Estimate::VeryUnlikely),
-			3  => Some(Estimate::Unlikely),
-			4  => Some(Estimate::FiftyFifty),
-			5  => Some(Estimate::SomewhatLikely),
-			6  => Some(Estimate::Likely),
-			7  => Some(Estimate::VeryLikely),
-			8  => Some(Estimate::NearSureThing),
-			9  => Some(Estimate::SureThing),
-			10 => Some(Estimate::HasToBe),
-			_  => None
+			0  => Estimate::Impossible,
+			1  => Estimate::NoWay,
+			2  => Estimate::VeryUnlikely,
+			3  => Estimate::Unlikely,
+			4  => Estimate::FiftyFifty,
+			5  => Estimate::SomewhatLikely,
+			6  => Estimate::Likely,
+			7  => Estimate::VeryLikely,
+			8  => Estimate::NearSureThing,
+			9  => Estimate::SureThing,
+			10 => Estimate::HasToBe,
+			_  => panic!(),
 		}
 	}
-
 }
 
 impl Display for Estimate {
-
 	fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
 		use self::Estimate::*;
 		return write!(f, "{}", match *self {
@@ -55,5 +55,4 @@ impl Display for Estimate {
 			HasToBe        => "Has To Be",
 		});
 	}
-
 }

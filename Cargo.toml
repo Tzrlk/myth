@@ -23,7 +23,7 @@ version  = "^0.13.0"
 features = [ "bundled" ]
 
 [dev-dependencies]
-# stainless = "^0.1"
+stainless = "^0.1.12"
 
 [package.metadata.release]
 sign-commit = true
