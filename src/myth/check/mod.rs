@@ -3,7 +3,7 @@
 use clap::{ App, ArgMatches, SubCommand, Arg };
 
 use ::util::cli_node::CliNode;
-use ::core::fate::calc;
+use ::core::fate;
 
 pub struct Cmd;
 
@@ -55,7 +55,7 @@ impl CliNode for Cmd {
 		let chaos    = args.value_of("chaos")   .unwrap().parse::<i32>().unwrap();
 		let desired  = args.value_of("desired").unwrap() == "yes";
 
-		let result = calc::calc(estimate, chaos, true);
+		let result = fate::calc(estimate, chaos, true);
 		print!("{}", result);
 
 	}

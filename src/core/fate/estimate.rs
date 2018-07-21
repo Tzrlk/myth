@@ -14,21 +14,19 @@ pub enum Estimate {
 	HasToBe        =  8,
 }
 
-impl Estimate {
-}
-
 impl From<i32> for Estimate {
 	fn from(index: i32) -> Self {
+		use self::Estimate::*;
 		return match index {
-			-8 => Estimate::Impossible,
-			-6 => Estimate::NoWay,
-			-4 => Estimate::VeryUnlikely,
-			-2 => Estimate::Unlikely,
-			 0 => Estimate::FiftyFifty,
-			 2 => Estimate::Likely,
-			 4 => Estimate::VeryLikely,
-			 6 => Estimate::SureThing,
-			 8 => Estimate::HasToBe,
+			-8 => Impossible,
+			-6 => NoWay,
+			-4 => VeryUnlikely,
+			-2 => Unlikely,
+			 0 => FiftyFifty,
+			 2 => Likely,
+			 4 => VeryLikely,
+			 6 => SureThing,
+			 8 => HasToBe,
 			_  => panic!(),
 		}
 	}
