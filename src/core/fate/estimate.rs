@@ -3,17 +3,15 @@
 use std::fmt::{ Display, Formatter, Error };
 
 pub enum Estimate {
-	Impossible     = 0,
-	NoWay          = 1,
-	VeryUnlikely   = 2,
-	Unlikely       = 3,
-	FiftyFifty     = 4,
-	SomewhatLikely = 5,
-	Likely         = 6,
-	VeryLikely     = 7,
-	NearSureThing  = 8,
-	SureThing      = 9,
-	HasToBe        = 10,
+	Impossible     = -8,
+	NoWay          = -6,
+	VeryUnlikely   = -4,
+	Unlikely       = -2,
+	FiftyFifty     =  0,
+	Likely         =  2,
+	VeryLikely     =  4,
+	SureThing      =  6,
+	HasToBe        =  8,
 }
 
 impl Estimate {
@@ -22,17 +20,15 @@ impl Estimate {
 impl From<i32> for Estimate {
 	fn from(index: i32) -> Self {
 		return match index {
-			0  => Estimate::Impossible,
-			1  => Estimate::NoWay,
-			2  => Estimate::VeryUnlikely,
-			3  => Estimate::Unlikely,
-			4  => Estimate::FiftyFifty,
-			5  => Estimate::SomewhatLikely,
-			6  => Estimate::Likely,
-			7  => Estimate::VeryLikely,
-			8  => Estimate::NearSureThing,
-			9  => Estimate::SureThing,
-			10 => Estimate::HasToBe,
+			-8 => Estimate::Impossible,
+			-6 => Estimate::NoWay,
+			-4 => Estimate::VeryUnlikely,
+			-2 => Estimate::Unlikely,
+			 0 => Estimate::FiftyFifty,
+			 2 => Estimate::Likely,
+			 4 => Estimate::VeryLikely,
+			 6 => Estimate::SureThing,
+			 8 => Estimate::HasToBe,
 			_  => panic!(),
 		}
 	}
@@ -47,10 +43,8 @@ impl Display for Estimate {
 			VeryUnlikely   => "Very Unlikely",
 			Unlikely       => "Unlikely",
 			FiftyFifty     => "Fifty-Fifty",
-			SomewhatLikely => "Somewhat Likely",
 			Likely         => "Likely",
 			VeryLikely     => "Very likely",
-			NearSureThing  => "Near Sure Thing",
 			SureThing      => "Sure Thing",
 			HasToBe        => "Has To Be",
 		});
