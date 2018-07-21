@@ -4,7 +4,7 @@ use num::Integer;
 use rand::thread_rng;
 use rand::distributions::{ Range, IndependentSample };
 
-use ::core::calc_result::CalcResult;
+use super::result::CalcResult;
 
 /// This calculates which of the four results should occur given estimate and chaos scores.
 pub fn calc(estimate: i32, chaos: i32, desire_yes: bool) -> CalcResult {
