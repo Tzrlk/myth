@@ -56,7 +56,7 @@ impl CliNode for Cmd {
 		let chaos    = args.value_of("chaos")   .unwrap().parse::<i32>().unwrap();
 		let desired  = args.value_of("desired").unwrap() == "yes";
 
-		let result = fate::calc(estimate, chaos, true).unwrap();
+		let result = fate::calc(estimate, chaos, true);
 		print!("{}", result);
 
 	}

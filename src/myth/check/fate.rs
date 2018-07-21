@@ -7,7 +7,7 @@ use rand::distributions::{ Range, IndependentSample };
 use ::core::calc_result::CalcResult;
 
 /// This calculates which of the four results should occur given estimate and chaos scores.
-pub fn calc(estimate: i32, chaos: i32, desire_yes: bool) -> Option<CalcResult> {
+pub fn calc(estimate: i32, chaos: i32, desire_yes: bool) -> CalcResult {
 
 	// Make the three needed d10 rolls.
 	let roll_1 = Range::new(1, 10).ind_sample(&mut thread_rng());
@@ -15,44 +15,11 @@ pub fn calc(estimate: i32, chaos: i32, desire_yes: bool) -> Option<CalcResult> {
 	let roll_3 = Range::new(1, 10).ind_sample(&mut thread_rng());
 
 	// Calculate the result based on the rolls generated.
-	return calc_result(estimate, chaos, desire_yes, roll_1, roll_2, roll_3);
-
-}
-
-fn calc_result(
-	estimate:   i32,
-	chaos:      i32,
-	desire_yes: bool,
-	roll_1:     i32,
-	roll_2:     i32,
-	roll_3:     i32
-
-) -> Option<CalcResult> {
-
-	// Calculate the result of the check.
-	let result = roll_1 + roll_2 + calc_estimate_mod(estimate) + calc_chaos_mod(chaos, desire_yes);
-	let is_yes = result >= 11;
-
-	// If the chaos die is above the chaos factor, don't bother calculating chaos cases and just
-	// return early.
-	if roll_3 > chaos {
-		return Some(CalcResult {
-			yes_result:   is_yes,
-			exceptional:  false,
-			random_event: false
-		});
-	}
-
-	// Calculate the chaos cases.
-	let exceptional  = ( roll_1.is_odd()  && roll_2.is_odd()  ) || ( roll_1 == roll_2 );
-	let random_event = ( roll_1.is_even() && roll_2.is_even() ) || ( roll_1 == roll_2 );
-
-	// Return the appropriate result.
-	return Some(CalcResult {
-		yes_result: is_yes,
-		exceptional,
-		random_event
-	});
+	return CalcResult {
+		yes_result:   roll_is_yes(roll_1, roll_2, estimate, chaos, desire_yes),
+		exceptional:  roll_is_exceptional(roll_1, roll_2, roll_3, chaos),
+		random_event: roll_is_random_event(roll_1, roll_2, roll_3, chaos)
+	};
 
 }
 
@@ -72,6 +39,11 @@ fn calc_chaos_mod(chaos: i32, desired: bool) -> i32 {
 	};
 }
 
+fn roll_is_yes(roll_1: i32, roll_2: i32, estimate: i32, chaos: i32, desire_yes: bool) -> bool {
+	return roll_1 + roll_2 + calc_estimate_mod(estimate) + calc_chaos_mod(chaos, desire_yes)
+			>= 11;
+}
+
 fn roll_is_exceptional(roll_1: i32, roll_2: i32, roll_3: i32, chaos: i32) -> bool {
 	return ( roll_3 <= chaos ) && ( roll_1 == roll_2 || ( roll_1.is_odd() && roll_2.is_odd() ) );
 }
@@ -83,6 +55,30 @@ fn roll_is_random_event(roll_1: i32, roll_2: i32, roll_3: i32, chaos: i32) -> bo
 #[cfg(test)]
 mod tests {
 	use super::*;
+
+	fn test_random_event(roll_1: i32, roll_2: i32, chaos_triggered: bool, expected: bool) {
+		for chaos in 3..6 {
+			let chaos_roll_lower = if chaos_triggered { 1 } else { chaos + 1 };
+			let chaos_roll_upper = if chaos_triggered { chaos } else { 10 };
+			for chaos_roll in chaos_roll_lower..chaos_roll_upper {
+				assert_eq!(expected, roll_is_random_event(roll_1, roll_2, chaos_roll, chaos),
+						"expected: {}, roll_1: {}, roll_2: {}, roll_3: {}, chaos: {}",
+						expected, roll_1, roll_2, chaos_roll, chaos);
+			}
+		}
+	}
+
+	fn test_exceptional(roll_1: i32, roll_2: i32, chaos_triggered: bool, expected: bool) {
+		for chaos in 3..6 {
+			let chaos_roll_lower = if chaos_triggered { 1 } else { chaos + 1 };
+			let chaos_roll_upper = if chaos_triggered { chaos } else { 10 };
+			for chaos_roll in chaos_roll_lower..chaos_roll_upper {
+				assert_eq!(expected, roll_is_exceptional(roll_1, roll_2, chaos_roll, chaos),
+						"expected: {}, roll_1: {}, roll_2: {}, roll_3: {}, chaos: {}",
+						expected, roll_1, roll_2, chaos_roll, chaos);
+			}
+		}
+	}
 
 	describe! fate {
 
@@ -142,12 +138,25 @@ mod tests {
 
 		describe! roll_is_exceptional {
 
-			it "returns false when chaos above 3rd roll" {
-				for chaos in 3..6 {
-					let roll_1 = Range::new(1, 10).ind_sample(&mut thread_rng());
-					let roll_2 = Range::new(1, 10).ind_sample(&mut thread_rng());
-					for chaos_roll in (chaos + 1)..10 {
-						assert!(!roll_is_exceptional(roll_1, roll_2, chaos_roll, chaos));
+			it "returns false for all roll results when current chaos > 3rd roll" {
+				for roll_1 in 1..10 {
+					for roll_2 in 1..10 {
+						test_exceptional(roll_1, roll_2, false, false);
+					}
+				}
+			}
+
+			it "returns true for identical roll results when chaos < 3rd roll" {
+				for roll_result in 1..10 {
+					test_exceptional(roll_result, roll_result, true, true);
+				}
+			}
+
+			it "returns true for odd roll results when chaos < 3rd roll" {
+				for roll_1 in 1..10 {
+					for roll_2 in 1..10 {
+						let expected = roll_1 == roll_2 || roll_1.is_odd() && roll_2.is_odd();
+						test_exceptional(roll_1, roll_2, true, expected);
 					}
 				}
 			}
@@ -156,13 +165,26 @@ mod tests {
 
 		describe! roll_is_random_event {
 
-			it "returns false when chaos above 3rd roll" {
-				for chaos in 3..6 {
-					let roll_1 = Range::new(1, 10).ind_sample(&mut thread_rng());
-					let roll_2 = Range::new(1, 10).ind_sample(&mut thread_rng());
-					for chaos_roll in (chaos + 1)..10 {
-						assert!(!roll_is_random_event(roll_1, roll_2, chaos_roll, chaos));
-					};
+			it "returns false for all roll results when current chaos > 3rd roll" {
+				for roll_1 in 1..10 {
+					for roll_2 in 1..10 {
+						test_exceptional(roll_1, roll_2, false, false);
+					}
+				}
+			}
+
+			it "returns true for identical roll results when chaos < 3rd roll" {
+				for roll_result in 1..10 {
+					test_exceptional(roll_result, roll_result, true, true);
+				}
+			}
+
+			it "returns true for even roll results when chaos < 3rd roll" {
+				for roll_1 in 1..10 {
+					for roll_2 in 1..10 {
+						let expected = roll_1 == roll_2 || roll_1.is_even() && roll_2.is_even();
+						test_exceptional(roll_1, roll_2, true, expected);
+					}
 				}
 			}
 
