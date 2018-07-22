@@ -36,9 +36,8 @@ after_success:
 
 deploy:
 
-  - provider: releases
-    file: target/debug/gin.exe
+  - provider:     releases
+    file:         target/debug/myth.exe
     skip_cleanup: true
-    on:
-      tags: true
+    on:           { tags: true }
 
